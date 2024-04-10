@@ -57,14 +57,6 @@ st.subheader('types of platform started per year')
 platform_types_data = data.groupby(['Start', 'Type (ILO)']).size().unstack()
 st.bar_chart(platform_types_data, color=['#10A9B8', '#FFFF00', '#FF6341'])
 
-# platform_types_data = data[data['Continent'] == 'Africa'].groupby(['Start', 'Type (ILO)']).size().unstack()
-# st.bar_chart(platform_types_data, color=['#10A9B8', '#FFFF00', '#FF6341'])
-
-# platform_types_data = data[data['Continent'] == 'Asia'].groupby(['Start', 'Type (ILO)']).size().unstack()
-# st.bar_chart(platform_types_data, color=['#10A9B8', '#FFFF00', '#FF6341'])
-
-# platform_types_data = data[data['Continent'].isin(['Africa', 'Asia'])].groupby(['Start', 'Type (ILO)']).size().unstack()
-# st.bar_chart(platform_types_data, color=['#10A9B8', '#FFFF00', '#FF6341'])
 def continent_chart():
     data = pd.read_csv('./platforms-dataset.csv')
     df = data.set_index("Continent")
@@ -93,7 +85,7 @@ st.subheader('Typology')
 typology_df = data.pivot_table(index='Typology', columns='Start', aggfunc='size', fill_value=0)
 typology_df.reset_index(inplace=True)
 typology_df.drop_duplicates(subset='Typology', keep='first', inplace=True)
-
+filtered_typology_df = typology_df[typology_df['Typology'].isin(['Online contracting intermediaries', 'Online marketplace with a threshold', 'Online marketplace', 'Situ intermediaries', 'Situ marketplace with a threshold', 'Situ marketplace'])]
 sector_df = data.pivot_table(index='Sector (ILO definitions)', columns='Start', aggfunc='size', fill_value=0)
 sector_df.reset_index(inplace=True)
 sector_df.drop_duplicates(subset='Sector (ILO definitions)', keep='first', inplace=True)
@@ -125,7 +117,7 @@ def bubble_chart(pivot_df, main_column):
 
     st.plotly_chart(fig, theme=None)
 
-bubble_chart(typology_df, 'Typology')
+bubble_chart(filtered_typology_df, 'Typology')
 
 bubble_chart(sector_df, 'Sector (ILO definitions)')
 bubble_chart(sub_category_df, 'Sub-category')
