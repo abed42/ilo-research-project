@@ -6,32 +6,32 @@ import pydeck as pdk
 import plotly.express as px
 import hmac
 
-def check_password():
-    """Returns `True` if the user had the correct password."""
+# def check_password():
+#     """Returns `True` if the user had the correct password."""
 
-    def password_entered():
-        """Checks whether a password entered by the user is correct."""
-        if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]  # Don't store the password.
-        else:
-            st.session_state["password_correct"] = False
+#     def password_entered():
+#         """Checks whether a password entered by the user is correct."""
+#         if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
+#             st.session_state["password_correct"] = True
+#             del st.session_state["password"]  # Don't store the password.
+#         else:
+#             st.session_state["password_correct"] = False
 
-    # Return True if the password is validated.
-    if st.session_state.get("password_correct", False):
-        return True
+#     # Return True if the password is validated.
+#     if st.session_state.get("password_correct", False):
+#         return True
 
-    # Show input for password.
-    st.text_input(
-        "Password", type="password", on_change=password_entered, key="password"
-    )
-    if "password_correct" in st.session_state:
-        st.error("😕 Password incorrect")
-    return False
+#     # Show input for password.
+#     st.text_input(
+#         "Password", type="password", on_change=password_entered, key="password"
+#     )
+#     if "password_correct" in st.session_state:
+#         st.error("😕 Password incorrect")
+#     return False
 
 
-if not check_password():
-    st.stop()  # Do not continue if check_password is not True.
+# if not check_password():
+#     st.stop()  # Do not continue if check_password is not True.
 
 
 
@@ -125,6 +125,13 @@ bubble_chart(sub_category_df, 'Sub-category')
 
 data['Matching method'] = data['Matching method'].replace('-', 'Unknown', regex=True)
 
+# Define the color mapping
+color_map = {
+    'Unknown': 'pink',
+    # 'Algorithmic matching': 'red',
+    'Free choice': 'blue',
+    'Hand matching': 'lightblue'
+}
 # Assuming 'data' is your DataFrame
 counts = data.groupby(['Skill level (digital)', 'Matching method']).size().reset_index(name='Count')
 
@@ -143,12 +150,14 @@ counts['Percentage'] = counts['Percentage'].round(1)
 # Create a bar chart to visualize the counts
 fig_counts = px.bar(counts, x='Skill level (digital)', y='Count', color='Matching method', text_auto=True,
                     title='Matching Method by Digital Skill Level',
-                    labels={'Count': 'Number of Occurrences'})
+                    labels={'Count': 'Number of Occurrences'},
+                    color_discrete_map=color_map)
 
 # Create a bar chart to visualize the rounded percentages
 fig_percentage = px.bar(counts, x='Skill level (digital)', y='Percentage', color='Matching method', text_auto=True,
                         title='Matching Method by Digital Skill Level (Percentage)',
-                        labels={'Percentage': 'Percentage of Occurrences'})
+                        labels={'Percentage': 'Percentage of Occurrences'},
+                        color_discrete_map=color_map)
 fig_percentage.update_traces(textfont_size=16)
 fig_counts.update_traces(textfont_size=16,)
 # Create two tabs
@@ -181,12 +190,14 @@ counts['Percentage'] = counts['Percentage'].round(1)
 # Create a bar chart to visualize the counts
 fig_counts = px.bar(counts, x='Skill level (professional)', y='Count', color='Matching method', text_auto=True,
                     title='Matching Method by Professional Skill Level',
-                    labels={'Count': 'Number of Occurrences'})
+                    labels={'Count': 'Number of Occurrences'},
+                    color_discrete_map=color_map)
 
 # Create a bar chart to visualize the rounded percentages
 fig_percentage = px.bar(counts, x='Skill level (professional)', y='Percentage', color='Matching method', text_auto=True,
                         title='Matching Method by Professional Skill Level (Percentage)',
-                        labels={'Percentage': 'Percentage of Occurrences'})
+                        labels={'Percentage': 'Percentage of Occurrences'},
+                    color_discrete_map=color_map)
 fig_percentage.update_traces(textfont_size=16)
 fig_counts.update_traces(textfont_size=16)
 
@@ -201,3 +212,89 @@ with tab1:
 # Display the count chart in the second tab
 with tab2:
     st.plotly_chart(fig_counts, theme="streamlit")
+
+
+# # Assuming 'data' is your DataFrame
+# data['Matching method'] = data['Matching method'].replace('-', 'Unknown', regex=True)
+
+# # Define the color mapping
+# color_map = {
+#     'Unknown': 'pink',
+#     'Algorithmic matching': 'red',
+#     'Free choice': 'blue',
+#     'Hand matching': 'lightblue'
+# }
+
+# # Group the data by 'Skill level (professional)' and 'Matching method', and count the occurrences
+# counts_professional = data.groupby(['Skill level (professional)', 'Matching method']).size().reset_index(name='Count')
+
+# # Calculate the total count for each 'Skill level (professional)'
+# total_counts_professional = data.groupby('Skill level (professional)').size().reset_index(name='Total Count')
+
+# # Merge the total counts with the original counts DataFrame
+# counts_professional = counts_professional.merge(total_counts_professional, on='Skill level (professional)')
+
+# # Calculate the percentage for each 'Matching method' within each 'Skill level (professional)'
+# counts_professional['Percentage'] = (counts_professional['Count'] / counts_professional['Total Count']) * 100
+
+# # Round the percentage to 1 decimal place
+# counts_professional['Percentage'] = counts_professional['Percentage'].round(1)
+
+# # Create a bar chart to visualize the counts for 'Skill level (professional)'
+# fig_counts_professional = px.bar(counts_professional, x='Skill level (professional)', y='Count', color='Matching method', text_auto=True,
+#                                 title='Matching Method by Professional Skill Level',
+#                                 labels={'Count': 'Number of Occurrences'},
+#                                 color_discrete_map=color_map)
+
+# # Create a bar chart to visualize the rounded percentages for 'Skill level (professional)'
+# fig_percentage_professional = px.bar(counts_professional, x='Skill level (professional)', y='Percentage', color='Matching method', text_auto=True,
+#                                     title='Matching Method by Professional Skill Level (Percentage)',
+#                                     labels={'Percentage': 'Percentage of Occurrences'},
+#                                     color_discrete_map=color_map)
+
+# # Repeat the above steps for 'Skill level (digital)'
+# counts_digital = data.groupby(['Skill level (digital)', 'Matching method']).size().reset_index(name='Count')
+# total_counts_digital = data.groupby('Skill level (digital)').size().reset_index(name='Total Count')
+# counts_digital = counts_digital.merge(total_counts_digital, on='Skill level (digital)')
+# counts_digital['Percentage'] = (counts_digital['Count'] / counts_digital['Total Count']) * 100
+# counts_digital['Percentage'] = counts_digital['Percentage'].round(1)
+
+# fig_counts_digital = px.bar(counts_digital, x='Skill level (digital)', y='Count', color='Matching method', text_auto=True,
+#                            title='Matching Method by Digital Skill Level',
+#                            labels={'Count': 'Number of Occurrences'},
+#                            color_discrete_map=color_map)
+
+# fig_percentage_digital = px.bar(counts_digital, x='Skill level (digital)', y='Percentage', color='Matching method', text_auto=True,
+#                                title='Matching Method by Digital Skill Level (Percentage)',
+#                                labels={'Percentage': 'Percentage of Occurrences'},
+#                                color_discrete_map=color_map)
+
+# # Display the charts in the Streamlit app
+# st.plotly_chart(fig_counts_professional)
+# st.plotly_chart(fig_percentage_professional)
+# st.plotly_chart(fig_counts_digital)
+# st.plotly_chart(fig_percentage_digital)
+
+
+# # Assuming 'data' is your DataFrame
+# data['Matching method'] = data['Matching method'].replace('-', 'Unknown', regex=True)
+
+# # Define the color mapping
+# color_map = {
+#     'Algorithmic matching': 'red',
+#     'Unknown': 'pink',
+#     'Free choice': 'blue',
+#     'Hand matching': 'lightblue'
+# }
+
+# # Group the data by 'Skill level (professional)' and 'Matching method', and count the occurrences
+# counts = data.groupby(['Skill level (professional)', 'Matching method']).size().reset_index(name='Count')
+
+# # Create a bar chart to visualize the counts
+# fig = px.bar(counts, x='Skill level (professional)', y='Count', color='Matching method', text_auto=True,
+#              title='Matching Method by Professional Skill Level',
+#              labels={'Count': 'Number of Occurrences'},
+#              color_discrete_map=color_map) # Apply the color mapping
+
+# # Display the bar chart in the Streamlit app
+# st.plotly_chart(fig)
