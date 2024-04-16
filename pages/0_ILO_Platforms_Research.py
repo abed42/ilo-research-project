@@ -123,6 +123,7 @@ bubble_chart(typology_df, 'Typology')
 bubble_chart(sector_df, 'Sector (ILO definitions)')
 bubble_chart(sub_category_df, 'Sub-category')
 
+data['Matching method'] = data['Matching method'].replace('-', 'Unknown', regex=True)
 
 # Assuming 'data' is your DataFrame
 counts = data.groupby(['Skill level (digital)', 'Matching method']).size().reset_index(name='Count')
