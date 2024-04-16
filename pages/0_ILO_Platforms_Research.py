@@ -118,28 +118,85 @@ def bubble_chart(pivot_df, main_column):
     st.plotly_chart(fig, theme=None)
 
 bubble_chart(filtered_typology_df, 'Typology')
+bubble_chart(typology_df, 'Typology')
 
 bubble_chart(sector_df, 'Sector (ILO definitions)')
 bubble_chart(sub_category_df, 'Sub-category')
 
-counts = data.groupby(['Skill level (professional)', 'Matching method']).size().reset_index(name='Count')
 
-# Create a bar chart to visualize the counts
-fig = px.bar(counts, x='Skill level (professional)', y='Count', color='Matching method',
-                title='Matching Method by Professional Skill Level',
-                labels={'Count': 'Number of Occurrences'})
-
-# Display the bar chart in the Streamlit app
-st.plotly_chart(fig)
-
-
-
+# Assuming 'data' is your DataFrame
 counts = data.groupby(['Skill level (digital)', 'Matching method']).size().reset_index(name='Count')
 
-# Create a bar chart to visualize the counts
-fig = px.bar(counts, x='Skill level (digital)', y='Count', color='Matching method',
-                title='Matching Method by Digital Skill Level',
-                labels={'Count': 'Number of Occurrences'})
+# Calculate the total count for each 'Skill level (digital)'
+total_counts = data.groupby('Skill level (digital)').size().reset_index(name='Total Count')
 
-# Display the bar chart in the Streamlit app
-st.plotly_chart(fig)
+# Merge the total counts with the original counts DataFrame
+counts = counts.merge(total_counts, on='Skill level (digital)')
+
+# Calculate the percentage for each 'Matching method' within each 'Skill level (digital)'
+counts['Percentage'] = (counts['Count'] / counts['Total Count']) * 100
+
+# Round the percentage to 1 decimal place
+counts['Percentage'] = counts['Percentage'].round(1)
+
+# Create a bar chart to visualize the counts
+fig_counts = px.bar(counts, x='Skill level (digital)', y='Count', color='Matching method', text_auto=True,
+                    title='Matching Method by Digital Skill Level',
+                    labels={'Count': 'Number of Occurrences'})
+
+# Create a bar chart to visualize the rounded percentages
+fig_percentage = px.bar(counts, x='Skill level (digital)', y='Percentage', color='Matching method', text_auto=True,
+                        title='Matching Method by Digital Skill Level (Percentage)',
+                        labels={'Percentage': 'Percentage of Occurrences'})
+fig_percentage.update_traces(textfont_size=16)
+fig_counts.update_traces(textfont_size=16,)
+# Create two tabs
+tab1, tab2 = st.tabs(["Percentage of Occurrences", "Number of Occurrences"])
+
+# Display the percentage chart in the first tab
+with tab1:
+    st.plotly_chart(fig_percentage, theme="streamlit")
+
+# Display the count chart in the second tab
+with tab2:
+    st.plotly_chart(fig_counts, theme="streamlit")
+
+
+# Assuming 'data' is your DataFrame
+counts = data.groupby(['Skill level (professional)', 'Matching method']).size().reset_index(name='Count')
+
+# Calculate the total count for each 'Skill level (professional)'
+total_counts = data.groupby('Skill level (professional)').size().reset_index(name='Total Count')
+
+# Merge the total counts with the original counts DataFrame
+counts = counts.merge(total_counts, on='Skill level (professional)')
+
+# Calculate the percentage for each 'Matching method' within each 'Skill level (professional)'
+counts['Percentage'] = (counts['Count'] / counts['Total Count']) * 100
+
+# Round the percentage to 1 decimal place
+counts['Percentage'] = counts['Percentage'].round(1)
+
+# Create a bar chart to visualize the counts
+fig_counts = px.bar(counts, x='Skill level (professional)', y='Count', color='Matching method', text_auto=True,
+                    title='Matching Method by Professional Skill Level',
+                    labels={'Count': 'Number of Occurrences'})
+
+# Create a bar chart to visualize the rounded percentages
+fig_percentage = px.bar(counts, x='Skill level (professional)', y='Percentage', color='Matching method', text_auto=True,
+                        title='Matching Method by Professional Skill Level (Percentage)',
+                        labels={'Percentage': 'Percentage of Occurrences'})
+fig_percentage.update_traces(textfont_size=16)
+fig_counts.update_traces(textfont_size=16)
+
+
+# Create two tabs
+tab1, tab2 = st.tabs(["Percentage of Occurrences", "Number of Occurrences"])
+
+# Display the percentage chart in the first tab
+with tab1:
+    st.plotly_chart(fig_percentage, theme="streamlit")
+
+# Display the count chart in the second tab
+with tab2:
+    st.plotly_chart(fig_counts, theme="streamlit")
